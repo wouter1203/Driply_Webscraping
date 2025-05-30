@@ -1,5 +1,4 @@
 import os
-import logging
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
@@ -12,9 +11,12 @@ from google.cloud import firestore
 import uuid
 import json
 import time
+from rembg import remove, new_session
+from loguru import logger
 
-# Configure logging for Cloud Run
-logging.basicConfig(level=logging.INFO)
+# Configure loguru for concise logs
+logger.remove()
+logger.add(lambda msg: print(msg, end=""), format="<level>{level}</level> | {message}\n", colorize=True)
 
 # It's good practice to define the User-Agent globally or at the top of the function
 HEADERS = {
@@ -25,17 +27,17 @@ def download_image(img_url_tuple, max_retries=3):
     idx, img_url, folder_name = img_url_tuple
     for attempt in range(1, max_retries + 1):
         try:
-            logging.debug(f"Downloading image {idx} (attempt {attempt}): {img_url}")
+            logger.debug(f"Downloading {idx} (try {attempt}): {img_url}")
             img_data = requests.get(img_url, timeout=10).content
             img_path = os.path.join(folder_name, f"image_{idx}.jpg")
             with open(img_path, "wb") as f:
                 f.write(img_data)
-            logging.info(f"✅ Downloaded image {idx} successfully!")
+            logger.info(f"Downloaded {idx}")
             return True
         except Exception as e:
-            logging.warning(f"Failed to download {img_url} (attempt {attempt}): {e}")
+            logger.warning(f"Failed {img_url} (try {attempt}): {e}")
             if attempt == max_retries:
-                logging.error(f"❌ Giving up on {img_url} after {max_retries} attempts.")
+                logger.error(f"Giving up {img_url}")
                 return False
 
 def upload_image_to_gcs(image_bytes, bucket_name, blob_name):
@@ -58,59 +60,70 @@ def upload_image_to_gcs(image_bytes, bucket_name, blob_name):
     return url
 
 def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None):
-    logging.info(f"Starting scrape_listing_images for URL: {url}")
+    logger.info(f"Scraping: {url}")
 
     total_start_time = time.time()
 
     uploaded_links = load_uploaded_links()
     new_uploaded_links = set(uploaded_links)
 
-    # Create a session object
     with requests.Session() as session:
-        # Set default headers for the session
         session.headers.update(HEADERS)
 
         with sync_playwright() as p:
-            logging.debug("Launching browser...")
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=False)
             page = browser.new_page()
-            logging.debug("Navigating to page...")
-            # It's good practice to also set a User-Agent for Playwright if you want consistency,
-            # though it's the requests part we're primarily fixing for image downloads.
-            # page.set_extra_http_headers({"User-Agent": HEADERS['User-Agent']}) # Optional for Playwright
             page.goto(url, timeout=60000, wait_until="domcontentloaded")
-            logging.debug("Scrolling to load more products...")
 
-            scroll_pause = 5
+            scroll_pause = 0.1
+            scroll_step = 600
+            stuck_count = 0
+            stuck_limit = 3
+
+            current_position = 0
             last_height = page.evaluate("() => document.body.scrollHeight")
-            for i in range(10):
-                page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+
+            while stuck_count < stuck_limit:
+                current_position += scroll_step
+                page.evaluate(f"window.scrollTo(0, {current_position});")
                 page.wait_for_timeout(int(scroll_pause * 1000))
                 new_height = page.evaluate("() => document.body.scrollHeight")
-                logging.debug(f"Scrolled to {new_height} (step {i+1})")
-                if new_height == last_height:
-                    logging.debug("No more content to load.")
-                    break
+                logger.debug(f"Scroll: position={current_position}, height={new_height}")
+
+                if new_height > last_height:
+                    stuck_count = 0
+                else:
+                    stuck_count += 1
+                    # Give the page a bit more time to load if stuck
+                    page.wait_for_timeout(500)
+
+                # If we've reached or passed the bottom, scroll to the bottom explicitly
+                if current_position >= new_height:
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+                    page.wait_for_timeout(200)
+                    new_height = page.evaluate("() => document.body.scrollHeight")
+                    logger.debug(f"Force scroll to bottom: height={new_height}")
+                    if new_height == last_height:
+                        stuck_count += 1
+                    else:
+                        stuck_count = 0
+                    current_position = new_height
+
                 last_height = new_height
 
-            logging.debug("Waiting for product images to load...")
             try:
                 page.wait_for_selector('img.ltr-io0g65', timeout=10000)
-                logging.debug("Product images loaded.")
+                logger.debug("Images loaded.")
             except Exception as e:
-                logging.error(f"Timeout waiting for images: {e}")
+                logger.error(f"Timeout: {e}")
                 browser.close()
                 return {"error": "Timeout waiting for images."}
             page_content = page.content()
             browser.close()
-            logging.debug("Browser closed.")
 
-        logging.debug("Parsing HTML with BeautifulSoup...")
         soup = BeautifulSoup(page_content, "html.parser")
-
-        logging.debug("Searching for all <img> tags...")
         img_tags = soup.find_all("img")
-        logging.debug(f"Found {len(img_tags)} <img> tags.")
+        logger.debug(f"Found {len(img_tags)} imgs.")
         img_urls = []
         for img in img_tags:
             src = img.get("src")
@@ -120,7 +133,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                 and src.endswith(".jpg")
             ):
                 img_urls.append(src)
-                logging.debug(f"Added image URL: {src}")
+                logger.debug(f"Add img: {src}")
                 if max_items and len(img_urls) >= max_items:
                     break
 
@@ -132,7 +145,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             product_names = product_names[:max_items]
 
         if not img_urls:
-            logging.warning("No product images found.")
+            logger.warning("No images found.")
             return {"error": "No product images found."}
 
         db = firestore.Client()
@@ -140,32 +153,46 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         failed_uploads = 0
         uploaded_docs = []
 
-        for img_url, brand, product in zip(img_urls, brands, product_names):
+        rembg_session = new_session("birefnet-general")
+
+        for idx, (img_url, brand, product) in enumerate(zip(img_urls, brands, product_names)):
             iter_start_time = time.time()
             if img_url in uploaded_links:
-                logging.info(f"Skipping already uploaded image with doc_id: [already_uploaded]")
+                logger.info(f"Skip uploaded: [already_uploaded]")
                 continue
             attempt = 0
             success = False
             while attempt < 3 and not success:
                 attempt += 1
+                logger.info(f"Try {attempt}: {idx + 1}/{len(img_urls)}")
                 try:
-                    logging.info(f"Attempt {attempt} for image doc_id: [pending]")
-                    img_download_start = time.time()
                     response = session.get(img_url, timeout=10, stream=True)
                     response.raise_for_status()
                     img_data = response.content
-                    img_download_end = time.time()
-                    # Create Firestore doc to get doc_id before upload
+                    
+                    start_background_removal = time.time()
+                    
+                    logger.info(f"Starting background removal after: {start_background_removal - iter_start_time:.2f}s")
+
+                    img_data = remove(
+                        img_data,
+                        session=rembg_session,
+                        alpha_matting=True,
+                        alpha_matting_foreground_threshold=240,
+                        alpha_matting_background_threshold=10,
+                        alpha_matting_erode_size=10,
+                    )
+                    
+                    end_background_removal = time.time()
+                    
+                    logger.info(f"Background removal done in: {end_background_removal - start_background_removal:.2f}s")
+
                     doc_ref = db.collection(firestore_collection).document()
                     doc_id = doc_ref.id
                     folder_prefix = "wardrobe"
                     blob_name = f"{folder_prefix}/{doc_id}.jpg"
-                    logging.info(f"Downloading image for doc_id: {doc_id}")
-                    gcs_upload_start = time.time()
+                    logger.info(f"Uploading: {doc_id}")
                     public_url = upload_image_to_gcs(img_data, bucket_name, blob_name)
-                    gcs_upload_end = time.time()
-                    logging.info(f"GCS upload for doc_id: {doc_id} took {gcs_upload_end - gcs_upload_start:.2f} seconds")
                     metadata = {
                         "brand_name": brand,
                         "name": product,
@@ -181,20 +208,20 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                     new_uploaded_links.add(img_url)
                     success = True
                 except requests.exceptions.RequestException as e:
-                    logging.error(f"Failed to download image for doc_id: {doc_id if 'doc_id' in locals() else '[unknown]'} (attempt {attempt}): {e}")
+                    logger.error(f"Download fail: {doc_id if 'doc_id' in locals() else '[unknown]'} ({attempt}): {e}")
                     if attempt == 3:
                         failed_uploads += 1
                 except Exception as e:
-                    logging.error(f"An unexpected error occurred for doc_id: {doc_id if 'doc_id' in locals() else '[unknown]'} (attempt {attempt}): {e}")
+                    logger.error(f"Error: {doc_id if 'doc_id' in locals() else '[unknown]'} ({attempt}): {e}")
                     if attempt == 3:
                         failed_uploads += 1
             iter_end_time = time.time()
-            logging.info(f"Iteration for doc_id: {doc_id if 'doc_id' in locals() else '[unknown]'} took {iter_end_time - iter_start_time:.2f} seconds")
+            logger.debug(f"Iter {doc_id if 'doc_id' in locals() else '[unknown]'}: {iter_end_time - iter_start_time:.2f}s")
 
-        save_uploaded_links(new_uploaded_links) #
+        save_uploaded_links(new_uploaded_links)
 
         total_end_time = time.time()
-        logging.info(f"Total scrape_listing_images call took {total_end_time - total_start_time:.2f} seconds") #
+        logger.info(f"Done in {total_end_time - total_start_time:.2f}s")
 
     return {
         "uploaded": successful_uploads,
