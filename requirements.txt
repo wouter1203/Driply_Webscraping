@@ -1,0 +1,6 @@
+os
+pathlib
+playwright
+bs4
+requests
+rich
