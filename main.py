@@ -224,7 +224,7 @@ def scrape_http(request):
         if not req_data:
             return jsonify({"error": "Request must be in JSON format."}), 400
         url = req_data.get("url")
-        bucket_name = req_data.get("bucket_name")
+        bucket_name = "skilled-nation-432314-g6.firebasestorage.app"
         firestore_collection = req_data.get("firestore_collection")
         max_items = req_data.get("max_items")
         if not url:
