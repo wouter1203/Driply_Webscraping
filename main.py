@@ -158,7 +158,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         for idx, (img_url, brand, product) in enumerate(zip(img_urls, brands, product_names)):
             iter_start_time = time.time()
             if img_url in uploaded_links:
-                logger.info(f"Skip uploaded: [already_uploaded]")
+                logger.info(f"Skip uploaded: {idx}")
                 continue
             attempt = 0
             success = False
@@ -244,7 +244,7 @@ def save_uploaded_links(links):
     with open(UPLOADED_LINKS_FILE, "w") as f:
         json.dump(list(links), f)
 
-# @http
+@http
 def scrape_http(request):
     try:
         req_data = request.get_json(silent=True)
@@ -271,9 +271,3 @@ def scrape_http(request):
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": f"Internal server error: {e}"}), 500
-
-if __name__ == "__main__":
-    app = Flask(__name__)
-    # Use Flask's request object for local testing
-    app.add_url_rule("/scrape", view_func=lambda: scrape_http(request), methods=["POST"])
-    app.run(host="127.0.0.1", port=8080, debug=True)

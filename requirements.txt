@@ -1,6 +1,11 @@
-os
-pathlib
 playwright
 bs4
 requests
 rich
+onnxruntime-gpu
+rembg
+functions-framework
+flask
+google-cloud-storage
+google-cloud-firestore
+loguru
