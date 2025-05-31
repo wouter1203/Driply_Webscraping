@@ -8,3 +8,4 @@ google-cloud-firestore
 pyjwt
 rembg
 loguru
+onnxruntime-gpu
