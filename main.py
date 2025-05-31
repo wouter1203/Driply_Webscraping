@@ -4,8 +4,7 @@ from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import requests
 from rich.progress import track
-from functions_framework import http
-from flask import jsonify, request, Flask
+from flask import jsonify, request, Flask # Import Flask
 from google.cloud import storage
 from google.cloud import firestore
 import uuid
@@ -71,7 +70,8 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         session.headers.update(HEADERS)
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            # Change headless to True for Cloud Run deployment
+            browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             page.goto(url, timeout=60000, wait_until="domcontentloaded")
 
@@ -244,20 +244,23 @@ def save_uploaded_links(links):
     with open(UPLOADED_LINKS_FILE, "w") as f:
         json.dump(list(links), f)
 
-@http
-def scrape_http(request):
+# Create a Flask app instance
+app = Flask(__name__)
+
+# Register the scrape_http function as a Flask route
+@app.route("/", methods=["POST"])
+def scrape_http_flask():
     try:
         req_data = request.get_json(silent=True)
         if not req_data:
             return jsonify({"error": "Request must be in JSON format."}), 400
         url = req_data.get("url")
-        bucket_name = "skilled-nation-432314-g6.firebasestorage.app"
+        bucket_name = "skilled-nation-432314-g6.firebasestorage.app" # Use the fixed bucket name
         firestore_collection = req_data.get("firestore_collection")
         max_items = req_data.get("max_items")
         if not url:
             return jsonify({"error": "Missing required parameter: url"}), 400
-        if not bucket_name:
-            return jsonify({"error": "Missing required parameter: bucket_name"}), 400
+        # bucket_name is now hardcoded so no need to check
         if not firestore_collection:
             return jsonify({"error": "Missing required parameter: firestore_collection"}), 400
         if max_items is not None:
@@ -270,4 +273,9 @@ def scrape_http(request):
             return jsonify(result), 500
         return jsonify(result)
     except Exception as e:
+        logger.exception("Internal server error") # Log the full traceback
         return jsonify({"error": f"Internal server error: {e}"}), 500
+
+# This block is typically for local development and testing, not strictly needed for Cloud Run as Gunicorn will manage the app.
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
