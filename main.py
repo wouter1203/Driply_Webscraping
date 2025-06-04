@@ -76,10 +76,10 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             page = browser.new_page()
             page.goto(url, timeout=120000, wait_until="domcontentloaded")
 
-            scroll_pause = 0.5
-            scroll_step = 1000
+            scroll_pause = 2  # Increase pause to 2 seconds
+            scroll_step = 800
             stuck_count = 0
-            stuck_limit = 9
+            stuck_limit = 20  # Allow more scroll attempts before giving up
 
             current_position = 0
             last_height = page.evaluate("() => document.body.scrollHeight")
@@ -95,10 +95,8 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                     stuck_count = 0
                 else:
                     stuck_count += 1
-                    # Give the page a bit more time to load if stuck
-                    page.wait_for_timeout(500)
+                    page.wait_for_timeout(5000)
 
-                # If we've reached or passed the bottom, scroll to the bottom explicitly
                 if current_position >= new_height:
                     page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
                     page.wait_for_timeout(200)
@@ -111,6 +109,11 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                     current_position = new_height
 
                 last_height = new_height
+
+            # Extra forced scrolls to ensure all products are loaded
+            for _ in range(5):
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
+                page.wait_for_timeout(2000)
 
             try:
                 page.wait_for_selector('img.ltr-io0g65', timeout=10000)
