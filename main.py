@@ -123,17 +123,16 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             browser.close()
 
         soup = BeautifulSoup(page_content, "html.parser")
-        product_cards = soup.find_all("article", {"data-testid": "productCard"})
+
+        img_tags = soup.find_all("img", class_="ltr-io0g65")
         img_urls = []
-        for card in product_cards:
-            img = card.find("img")
-            if img:
-                src = img.get("src") or img.get("data-src")
-                if src and src.startswith("https://cdn-images.farfetch-contents.com/") and src.endswith(".jpg"):
-                    img_urls.append(src)
-                    logger.debug(f"Add img: {src}")
-                    if max_items and len(img_urls) >= max_items:
-                        break
+        for img in img_tags:
+            src = img.get("src") or img.get("data-src")
+            if src and src.startswith("https://cdn-images.farfetch-contents.com/") and src.endswith(".jpg"):
+                img_urls.append(src)
+                logger.debug(f"Add img: {src}")
+                if max_items and len(img_urls) >= max_items:
+                    break
 
         brands = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardBrandName"})]
         product_names = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardDescription"})]
