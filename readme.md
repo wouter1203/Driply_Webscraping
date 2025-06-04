@@ -87,3 +87,16 @@ Returns a JSON object with the number of successful and failed uploads, and the 
   playwright install
   ```
 - This project is intended for educational and personal use. Respect the terms of service of any website you scrape.
+
+
+curl -X POST http://localhost:8080/scrape \
+  -H "Content-Type: application/json" \
+  -d '{
+    "urls": [
+      "https://www.farfetch.com/nl/shopping/men/clothing-2/items.aspx?category=136332&designer=2327807",
+      "https://example.com/page2",
+      "https://example.com/page3"
+    ],
+    "firestore_collection": "wardrobe",
+    "max_items": 3
+  }'

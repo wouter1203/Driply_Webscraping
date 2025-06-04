@@ -1,3 +1,4 @@
+import http
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -243,24 +244,27 @@ def load_uploaded_links():
 def save_uploaded_links(links):
     with open(UPLOADED_LINKS_FILE, "w") as f:
         json.dump(list(links), f)
-
-# Create a Flask app instance
-app = Flask(__name__)
-
-# Register the scrape_http function as a Flask route
-@app.route("/", methods=["POST"])
-def scrape_http_flask():
+        
+def scrape_http(request):
     try:
         req_data = request.get_json(silent=True)
         if not req_data:
             return jsonify({"error": "Request must be in JSON format."}), 400
-        url = req_data.get("url")
-        bucket_name = "skilled-nation-432314-g6.firebasestorage.app" # Use the fixed bucket name
+
+        # Accept either a single URL or a list of URLs
+        urls = req_data.get("urls") or req_data.get("url")
+        if not urls:
+            return jsonify({"error": "Missing required parameter: url(s)"}), 400
+
+        # Always work with a list
+        if isinstance(urls, str):
+            urls = [urls]
+
+        bucket_name = "skilled-nation-432314-g6.firebasestorage.app"
         firestore_collection = req_data.get("firestore_collection")
         max_items = req_data.get("max_items")
-        if not url:
-            return jsonify({"error": "Missing required parameter: url"}), 400
-        # bucket_name is now hardcoded so no need to check
+        if not bucket_name:
+            return jsonify({"error": "Missing required parameter: bucket_name"}), 400
         if not firestore_collection:
             return jsonify({"error": "Missing required parameter: firestore_collection"}), 400
         if max_items is not None:
@@ -268,14 +272,45 @@ def scrape_http_flask():
                 max_items = int(max_items)
             except Exception:
                 return jsonify({"error": "max_items must be an integer"}), 400
-        result = scrape_listing_images(url, bucket_name, firestore_collection, max_items)
-        if "error" in result:
-            return jsonify(result), 500
-        return jsonify(result)
-    except Exception as e:
-        logger.exception("Internal server error") # Log the full traceback
-        return jsonify({"error": f"Internal server error: {e}"}), 500
 
-# This block is typically for local development and testing, not strictly needed for Cloud Run as Gunicorn will manage the app.
+        results = []
+        for url in urls:
+            result = scrape_listing_images(url, bucket_name, firestore_collection, max_items)
+            results.append({"url": url, "result": result})
+
+        # If only one URL, return just the result for backward compatibility
+        if len(results) == 1:
+            return jsonify(results[0])
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": f"Internal server error: {e}"}), 500
+    
+def main():
+    print("Welcome to Driply Webscraper!")
+    urls = input("Enter URL(s) (comma-separated for multiple): ").strip()
+    if not urls:
+        print("You must provide at least one URL.")
+        return
+    urls = [u.strip() for u in urls.split(",") if u.strip()]
+
+    firestore_collection = input("Enter Firestore collection name: ").strip()
+    if not firestore_collection:
+        print("You must provide a Firestore collection name.")
+        return
+
+    max_items = input("Max items to scrape (leave blank for no limit): ").strip()
+    max_items = int(max_items) if max_items.isdigit() else None
+
+    bucket_name = "skilled-nation-432314-g6.firebasestorage.app"  # Or prompt if you want
+
+    results = []
+    for url in urls:
+        result = scrape_listing_images(url, bucket_name, firestore_collection, max_items)
+        results.append({"url": url, "result": result})
+
+    print("\nResults:")
+    for res in results:
+        print(json.dumps(res, indent=2))
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    main()
