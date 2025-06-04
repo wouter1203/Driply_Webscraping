@@ -76,10 +76,10 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             page = browser.new_page()
             page.goto(url, timeout=60000, wait_until="domcontentloaded")
 
-            scroll_pause = 0.1
+            scroll_pause = 0.5
             scroll_step = 600
             stuck_count = 0
-            stuck_limit = 3
+            stuck_limit = 6
 
             current_position = 0
             last_height = page.evaluate("() => document.body.scrollHeight")
