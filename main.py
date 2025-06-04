@@ -77,7 +77,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             page.goto(url, timeout=120000, wait_until="domcontentloaded")
 
             scroll_pause = 0.5
-            scroll_step = 100
+            scroll_step = 1000
             stuck_count = 0
             stuck_limit = 6
 
