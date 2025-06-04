@@ -76,8 +76,8 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             page = browser.new_page()
             page.goto(url, timeout=60000, wait_until="domcontentloaded")
 
-            scroll_pause = 0.5
-            scroll_step = 600
+            scroll_pause = 1
+            scroll_step = 100
             stuck_count = 0
             stuck_limit = 6
 
@@ -141,6 +141,14 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         brands = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardBrandName"})]
         product_names = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardDescription"})]
 
+        # Align brands and product_names to match img_urls length
+        if len(brands) < len(img_urls):
+            brands += ["unknown"] * (len(img_urls) - len(brands))
+        if len(product_names) < len(img_urls):
+            product_names += ["unknown"] * (len(img_urls) - len(product_names))
+
+        logger.debug(f"Found {len(img_urls)} images, {len(brands)} brands, {len(product_names)} product names.")
+
         if max_items:
             brands = brands[:max_items]
             product_names = product_names[:max_items]
@@ -159,7 +167,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         for idx, (img_url, brand, product) in enumerate(zip(img_urls, brands, product_names)):
             iter_start_time = time.time()
             if img_url in uploaded_links:
-                logger.info(f"Skip uploaded: {idx}")
+                logger.info(f"Skip image at index {idx}: already uploaded ({img_url})")
                 continue
             attempt = 0
             success = False
