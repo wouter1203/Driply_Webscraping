@@ -74,9 +74,9 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
             # Change headless to True for Cloud Run deployment
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
-            page.goto(url, timeout=60000, wait_until="domcontentloaded")
+            page.goto(url, timeout=120000, wait_until="domcontentloaded")
 
-            scroll_pause = 1
+            scroll_pause = 0.5
             scroll_step = 100
             stuck_count = 0
             stuck_limit = 6
