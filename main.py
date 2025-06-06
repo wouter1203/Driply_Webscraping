@@ -71,21 +71,14 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         session.headers.update(HEADERS)
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=False)
             page = browser.new_page()
             page.goto(url, timeout=120000, wait_until="domcontentloaded")
 
-            # Wait for initial images before scrolling
-            try:
-                page.wait_for_selector('img', timeout=20000)
-                logger.debug("Initial images loaded, starting scroll.")
-            except Exception as e:
-                logger.error(f"Timeout waiting for initial images: {e}")
-
-            scroll_pause = 2
-            scroll_step = 800
+            scroll_pause = 0.3
+            scroll_step = 750
             stuck_count = 0
-            stuck_limit = 20
+            stuck_limit = 20  # Allow more scroll attempts before giving up
 
             current_position = 0
             last_height = page.evaluate("() => document.body.scrollHeight")
@@ -101,11 +94,11 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                     stuck_count = 0
                 else:
                     stuck_count += 1
-                    page.wait_for_timeout(2000)
+                    page.wait_for_timeout(5000)
 
                 if current_position >= new_height:
                     page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
-                    page.wait_for_timeout(500)
+                    page.wait_for_timeout(200)
                     new_height = page.evaluate("() => document.body.scrollHeight")
                     logger.debug(f"Force scroll to bottom: height={new_height}")
                     if new_height == last_height:
@@ -121,16 +114,19 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                 page.evaluate("window.scrollTo(0, document.body.scrollHeight);")
                 page.wait_for_timeout(2000)
 
-            # Wait a bit more for images to load after scrolling
-            page.wait_for_timeout(5000)
-
+            try:
+                page.wait_for_selector('img.ltr-io0g65', timeout=10000)
+                logger.debug("Images loaded.")
+            except Exception as e:
+                logger.error(f"Timeout: {e}")
+                browser.close()
+                return {"error": "Timeout waiting for images."}
             page_content = page.content()
             browser.close()
 
         soup = BeautifulSoup(page_content, "html.parser")
 
-        # Extract all img tags (optionally filter by class if needed)
-        img_tags = soup.find_all("img")  # or add class_="ltr-io0g65" if you want to filter
+        img_tags = soup.find_all("img", class_="ltr-io0g65")
         img_urls = []
         for img in img_tags:
             src = img.get("src") or img.get("data-src")
@@ -139,8 +135,6 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
                 logger.debug(f"Add img: {src}")
                 if max_items and len(img_urls) >= max_items:
                     break
-
-        logger.info(f"Found {len(img_urls)} images after scrolling.")
 
         brands = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardBrandName"})]
         product_names = [p.get_text(strip=True) for p in soup.find_all("p", {"data-component": "ProductCardDescription"})]
