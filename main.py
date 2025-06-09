@@ -326,7 +326,7 @@ def main():
     max_items = input("Max items to scrape (leave blank for no limit): ").strip()
     max_items = int(max_items) if max_items.isdigit() else None
 
-    bucket_name = "skilled-nation-432314-g6.firebasestorage.app"  # Or prompt if you want
+    bucket_name = "skilled-nation-432314-g6.firebasestorage.app"  # Hardcoded bucket name
 
     results = []
     for url in urls:
@@ -342,21 +342,23 @@ if __name__ == "__main__":
     asyncio.run(send_telegram_message("This is a test message from your Driply Webscraper bot!"))
 
     app = Flask(__name__)
-    app.run(port=5000)
+    app.run(host="0.0.0.0", port=5000)
 
     @app.route('/webhook', methods=['POST'])
     def telegram_webhook():
         """Handle incoming Telegram messages."""
         data = request.get_json()
+        logger.info(f"Webhook received data: {data}")
+
+        if not data:
+            return "No data received", 400
 
         # Extract message details
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
             text = data["message"].get("text", "")
 
-            # Parse the message for required parameters
             try:
-                # Expected format: "url=<url>, bucket_name=<bucket>, firestore_collection=<collection>"
                 params = dict(item.split("=") for item in text.split(", "))
                 url = params.get("url")
                 bucket_name = params.get("bucket_name")
@@ -365,20 +367,11 @@ if __name__ == "__main__":
                 if not url or not bucket_name or not firestore_collection:
                     raise ValueError("Missing required parameters.")
 
-                # Notify the user that scraping has started
                 asyncio.run(send_telegram_message(f"Scraping started for URL: {url}", chat_id))
-
-                # Perform the scraping
                 result = scrape_listing_images(url, bucket_name, firestore_collection)
-
-                # Notify the user that scraping is complete
                 asyncio.run(send_telegram_message(f"Scraping completed. Result: {result}", chat_id))
 
             except Exception as e:
-                # Notify the user about the error
                 asyncio.run(send_telegram_message(f"Error: {e}", chat_id))
-
-        logger.info(f"Received message: {text}")
-        logger.info(f"Parsed parameters: {params}")
 
         return "OK", 200
