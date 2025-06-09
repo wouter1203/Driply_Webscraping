@@ -366,16 +366,16 @@ if __name__ == "__main__":
                     raise ValueError("Missing required parameters.")
 
                 # Notify the user that scraping has started
-                send_telegram_message(f"Scraping started for URL: {url}", chat_id)
+                asyncio.run(send_telegram_message(f"Scraping started for URL: {url}", chat_id))
 
                 # Perform the scraping
                 result = scrape_listing_images(url, bucket_name, firestore_collection)
 
                 # Notify the user that scraping is complete
-                send_telegram_message(f"Scraping completed. Result: {result}", chat_id)
+                asyncio.run(send_telegram_message(f"Scraping completed. Result: {result}", chat_id))
 
             except Exception as e:
                 # Notify the user about the error
-                send_telegram_message(f"Error: {e}", chat_id)
+                asyncio.run(send_telegram_message(f"Error: {e}", chat_id))
 
         return "OK", 200
