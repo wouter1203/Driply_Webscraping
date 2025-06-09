@@ -378,4 +378,7 @@ if __name__ == "__main__":
                 # Notify the user about the error
                 asyncio.run(send_telegram_message(f"Error: {e}", chat_id))
 
+        logger.info(f"Received message: {text}")
+        logger.info(f"Parsed parameters: {params}")
+
         return "OK", 200
