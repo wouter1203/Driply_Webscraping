@@ -342,7 +342,6 @@ if __name__ == "__main__":
     asyncio.run(send_telegram_message("This is a test message from your Driply Webscraper bot!"))
 
     app = Flask(__name__)
-    app.run(host="0.0.0.0", port=5000)
 
     @app.route('/webhook', methods=['POST'])
     def telegram_webhook():
@@ -375,3 +374,6 @@ if __name__ == "__main__":
                 asyncio.run(send_telegram_message(f"Error: {e}", chat_id))
 
         return "OK", 200
+
+    # Start the Flask app
+    app.run(host="0.0.0.0", port=5000)
