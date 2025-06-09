@@ -29,10 +29,10 @@ HEADERS = {
 TELEGRAM_BOT_TOKEN = "7622892372:AAG2XjXEtCM2AU2kXcjkJst1XMDeXa5qyJs"
 TELEGRAM_CHAT_ID = "7006280010"
 
-def send_telegram_message(message, chat_id=TELEGRAM_CHAT_ID):
+async def send_telegram_message(message, chat_id=TELEGRAM_CHAT_ID):
     """Send a message to a Telegram chat."""
     bot = Bot(token=TELEGRAM_BOT_TOKEN)
-    bot.send_message(chat_id=chat_id, text=message)
+    await bot.send_message(chat_id=chat_id, text=message)
 
 def download_image(img_url_tuple, max_retries=3):
     idx, img_url, folder_name = img_url_tuple
