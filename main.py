@@ -13,8 +13,6 @@ import json
 import time
 from rembg import remove, new_session
 from loguru import logger
-from telegram import Bot
-import asyncio
 
 # Configure loguru for concise logs
 logger.remove()
@@ -24,15 +22,6 @@ logger.add(lambda msg: print(msg, end=""), format="<level>{level}</level> | {mes
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 }
-
-# Telegram Bot Token and Chat ID
-TELEGRAM_BOT_TOKEN = "7622892372:AAG2XjXEtCM2AU2kXcjkJst1XMDeXa5qyJs"
-TELEGRAM_CHAT_ID = "7006280010"
-
-async def send_telegram_message(message, chat_id=TELEGRAM_CHAT_ID):
-    """Send a message to a Telegram chat."""
-    bot = Bot(token=TELEGRAM_BOT_TOKEN)
-    await bot.send_message(chat_id=chat_id, text=message)
 
 def download_image(img_url_tuple, max_retries=3):
     idx, img_url, folder_name = img_url_tuple
@@ -154,7 +143,7 @@ def scrape_listing_images(url, bucket_name, firestore_collection, max_items=None
         if len(brands) < len(img_urls):
             brands += ["unknown"] * (len(img_urls) - len(brands))
         if len(product_names) < len(img_urls):
-            product_names += ["unknown"] * (len(imgUrls) - len(product_names))
+            product_names += ["unknown"] * (len(img_urls) - len(product_names))
 
         logger.debug(f"Found {len(img_urls)} images, {len(brands)} brands, {len(product_names)} product names.")
 
@@ -290,24 +279,16 @@ def scrape_http(request):
             except Exception:
                 return jsonify({"error": "max_items must be an integer"}), 400
 
-        # Notify Telegram that the scraping operation has started
-        asyncio.run(send_telegram_message(f"Scraping started for {len(urls)} URL(s)."))
-
         results = []
         for url in urls:
             result = scrape_listing_images(url, bucket_name, firestore_collection, max_items)
             results.append({"url": url, "result": result})
-
-        # Notify Telegram that the scraping operation has completed
-        asyncio.run(send_telegram_message(f"Scraping completed for {len(urls)} URL(s)."))
 
         # If only one URL, return just the result for backward compatibility
         if len(results) == 1:
             return jsonify(results[0])
         return jsonify(results)
     except Exception as e:
-        # Notify Telegram about the error
-        asyncio.run(send_telegram_message(f"Scraping failed: {e}"))
         return jsonify({"error": f"Internal server error: {e}"}), 500
     
 def main():
@@ -326,7 +307,7 @@ def main():
     max_items = input("Max items to scrape (leave blank for no limit): ").strip()
     max_items = int(max_items) if max_items.isdigit() else None
 
-    bucket_name = "skilled-nation-432314-g6.firebasestorage.app"  # Hardcoded bucket name
+    bucket_name = "skilled-nation-432314-g6.firebasestorage.app"  # Or prompt if you want
 
     results = []
     for url in urls:
@@ -338,42 +319,4 @@ def main():
         print(json.dumps(res, indent=2))
 
 if __name__ == "__main__":
-    # Test the Telegram integration
-    asyncio.run(send_telegram_message("This is a test message from your Driply Webscraper bot!"))
-
-    app = Flask(__name__)
-
-    @app.route('/webhook', methods=['POST'])
-    def telegram_webhook():
-        """Handle incoming Telegram messages."""
-        data = request.get_json()
-        logger.info(f"Webhook received data: {data}")
-
-        if not data:
-            return "No data received", 400
-
-        # Extract message details
-        if "message" in data:
-            chat_id = data["message"]["chat"]["id"]
-            text = data["message"].get("text", "")
-
-            try:
-                params = dict(item.split("=") for item in text.split(", "))
-                url = params.get("url")
-                bucket_name = params.get("bucket_name")
-                firestore_collection = params.get("firestore_collection")
-
-                if not url or not bucket_name or not firestore_collection:
-                    raise ValueError("Missing required parameters.")
-
-                asyncio.run(send_telegram_message(f"Scraping started for URL: {url}", chat_id))
-                result = scrape_listing_images(url, bucket_name, firestore_collection)
-                asyncio.run(send_telegram_message(f"Scraping completed. Result: {result}", chat_id))
-
-            except Exception as e:
-                asyncio.run(send_telegram_message(f"Error: {e}", chat_id))
-
-        return "OK", 200
-
-    # Start the Flask app
-    app.run(host="0.0.0.0", port=5000)
+    main()
