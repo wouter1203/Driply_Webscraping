@@ -1,0 +1,214 @@
+============================================================
+DUPLICATE DETECTION REPORT
+============================================================
+Collection: wardrobe
+Similarity Threshold: 0.95
+
+EXACT DUPLICATES:
+------------------------------
+Group 1 (2 items):
+  1. [KEEP] 5DxVZSGS6scwEZGgdTNQ - Casablanca - La Colomne T-shirt
+  2. [REMOVE] ZyvvA33Rsy2UEB7qku7C - Casablanca - La Colomne T-shirt
+
+Group 2 (2 items):
+  1. [KEEP] 61YPx1HnHJKiTy7dQevO - North 84 - Pants
+  2. [REMOVE] T6MzZFnCaHONwWFcnsix - North 84 - Pants
+
+Group 3 (2 items):
+  1. [KEEP] 8BgtlprtMIPihCk8XMvv - Casablanca - T-shirt met print
+  2. [REMOVE] 9xflmoVAimHcpQWEZUTJ - Casablanca - printed T-shirt
+
+Group 4 (2 items):
+  1. [KEEP] 9x4ahpfIRVlgs8a10piP - Casablanca - T-shirt met print
+  2. [REMOVE] Y7izThhxqifUNSadSDom - Casablanca - printed T-shirt
+
+Group 5 (3 items):
+  1. [KEEP] AreUdx4Nzbi2Iz3uxV1w - Casablanca - Équipement Sportif T-shirt
+  2. [REMOVE] HYCrZOJepejdspV7M1zE - Casablanca - Équipement Sportif T-shirt
+  3. [REMOVE] hO6Jn5g3JiyeU7CvA3Jc - Casablanca - Équipement Sportif T-shirt
+
+Group 6 (2 items):
+  1. [KEEP] AuQxSVQuCb0IufUXI6BG - Casablanca - T-shirt met print
+  2. [REMOVE] LvI58k1lSnoMO8hPksZF - Casablanca - printed T-shirt
+
+Group 7 (2 items):
+  1. [KEEP] H31u5PR2lVDLS3W8n7qq - Casablanca - LA Nights T-shirt
+  2. [REMOVE] WbAERV0LNeAGmEr3HuOD - Casablanca - LA Nights T-shirt
+
+Group 8 (2 items):
+  1. [KEEP] HMRmWkTu3JICQgkmEsTA - Casablanca - Le Passage T-shirt
+  2. [REMOVE] ZSeLF5visjXvosYgpC9g - Casablanca - Le Passage T-shirt
+
+Group 9 (2 items):
+  1. [KEEP] jiKSQZsMc1nmHR0ix9SJ - Casablanca - logo-embroidered t-shirt
+  2. [REMOVE] mSJm7K1GoSe7bZzkRRRB - Casablanca - T-shirt met geborduurd logo en ronde hals
+
+Group 10 (2 items):
+  1. [KEEP] kxPrPEZwGSIHsbQXWE5M - Casablanca - logo-print T-shirt
+  2. [REMOVE] mo1UEQtJ64gK62jgFQWk - Casablanca - T-shirt met logoprint
+
+SIMILAR IMAGES:
+------------------------------
+Pair 1 (Similarity: 0.953):
+  Doc1: 1FV49YnIizGvL8PbQna0 - Nike - Nike Air Force 1 '07 Black
+  Doc2: 7kUCXWLzZnwCQ6tZCjj6 - Nike - Nike Air Force 1 Flyknit 2.0
+
+Pair 2 (Similarity: 0.953):
+  Doc1: 1FV49YnIizGvL8PbQna0 - Nike - Nike Air Force 1 '07 Black
+  Doc2: APS49YtNhsWnU0h9xH84 - Nike - Air Force 1 '07 LV8
+
+Pair 3 (Similarity: 0.984):
+  Doc1: 1FV49YnIizGvL8PbQna0 - Nike - Nike Air Force 1 '07 Black
+  Doc2: KcEbYDDNxto0DjTHdY9J - Nike - Nike Air Max Plus OG
+
+Pair 4 (Similarity: 0.953):
+  Doc1: 1FV49YnIizGvL8PbQna0 - Nike - Nike Air Force 1 '07 Black
+  Doc2: vkrZdFzzALhyioiuEtvA - Nike - Nike NOCTA Air Force 1 Pink Foam
+
+Pair 5 (Similarity: 0.984):
+  Doc1: 20sP7Cv7qCrRkRSxjg3o - Burberry - Equestrian Knight T-shirt
+  Doc2: Nsoab9HcBd8mN37NUCpj - Burberry - EKD cotton T-shirt
+
+Pair 6 (Similarity: 0.953):
+  Doc1: 20sP7Cv7qCrRkRSxjg3o - Burberry - Equestrian Knight T-shirt
+  Doc2: ZAFpdo8cpCvyLCN3S2Mh - Burberry - Equestrian Knight-print cotton T-shirt
+
+Pair 7 (Similarity: 1.000):
+  Doc1: 5DxVZSGS6scwEZGgdTNQ - Casablanca - La Colomne T-shirt
+  Doc2: ZyvvA33Rsy2UEB7qku7C - Casablanca - La Colomne T-shirt
+
+Pair 8 (Similarity: 1.000):
+  Doc1: 61YPx1HnHJKiTy7dQevO - North 84 - Pants
+  Doc2: T6MzZFnCaHONwWFcnsix - North 84 - Pants
+
+Pair 9 (Similarity: 0.953):
+  Doc1: 61YPx1HnHJKiTy7dQevO - North 84 - Pants
+  Doc2: XkPnLn8no1Xr4efIZybu - Jacquemus - Loose fit cargopants
+
+Pair 10 (Similarity: 0.969):
+  Doc1: 7kUCXWLzZnwCQ6tZCjj6 - Nike - Nike Air Force 1 Flyknit 2.0
+  Doc2: KcEbYDDNxto0DjTHdY9J - Nike - Nike Air Max Plus OG
+
+Pair 11 (Similarity: 0.969):
+  Doc1: 7kUCXWLzZnwCQ6tZCjj6 - Nike - Nike Air Force 1 Flyknit 2.0
+  Doc2: vkrZdFzzALhyioiuEtvA - Nike - Nike NOCTA Air Force 1 Pink Foam
+
+Pair 12 (Similarity: 1.000):
+  Doc1: 8BgtlprtMIPihCk8XMvv - Casablanca - T-shirt met print
+  Doc2: 9xflmoVAimHcpQWEZUTJ - Casablanca - printed T-shirt
+
+Pair 13 (Similarity: 1.000):
+  Doc1: 9x4ahpfIRVlgs8a10piP - Casablanca - T-shirt met print
+  Doc2: Y7izThhxqifUNSadSDom - Casablanca - printed T-shirt
+
+Pair 14 (Similarity: 0.969):
+  Doc1: APS49YtNhsWnU0h9xH84 - Nike - Air Force 1 '07 LV8
+  Doc2: KcEbYDDNxto0DjTHdY9J - Nike - Nike Air Max Plus OG
+
+Pair 15 (Similarity: 0.969):
+  Doc1: AreUdx4Nzbi2Iz3uxV1w - Casablanca - Équipement Sportif T-shirt
+  Doc2: HMRmWkTu3JICQgkmEsTA - Casablanca - Le Passage T-shirt
+
+Pair 16 (Similarity: 1.000):
+  Doc1: AreUdx4Nzbi2Iz3uxV1w - Casablanca - Équipement Sportif T-shirt
+  Doc2: HYCrZOJepejdspV7M1zE - Casablanca - Équipement Sportif T-shirt
+
+Pair 17 (Similarity: 0.969):
+  Doc1: AreUdx4Nzbi2Iz3uxV1w - Casablanca - Équipement Sportif T-shirt
+  Doc2: ZSeLF5visjXvosYgpC9g - Casablanca - Le Passage T-shirt
+
+Pair 18 (Similarity: 1.000):
+  Doc1: AreUdx4Nzbi2Iz3uxV1w - Casablanca - Équipement Sportif T-shirt
+  Doc2: hO6Jn5g3JiyeU7CvA3Jc - Casablanca - Équipement Sportif T-shirt
+
+Pair 19 (Similarity: 1.000):
+  Doc1: AuQxSVQuCb0IufUXI6BG - Casablanca - T-shirt met print
+  Doc2: LvI58k1lSnoMO8hPksZF - Casablanca - printed T-shirt
+
+Pair 20 (Similarity: 0.969):
+  Doc1: DvSFDHICNTm0QOHHLezf - Casablanca - The Four Elements T-shirt
+  Doc2: HMQE5MTfLDGafvh5C2b0 - AMIRI - T-shirt met Garden-print
+
+Pair 21 (Similarity: 0.969):
+  Doc1: DvSFDHICNTm0QOHHLezf - Casablanca - The Four Elements T-shirt
+  Doc2: tanBhUfWsgbhBJlAu8bP - Casablanca - Tennis Club Icon T-shirt
+
+Pair 22 (Similarity: 0.953):
+  Doc1: DvSFDHICNTm0QOHHLezf - Casablanca - The Four Elements T-shirt
+  Doc2: x7NnJqjhHY37VEei6SJS - AMIRI - Snake T-shirt
+
+Pair 23 (Similarity: 0.953):
+  Doc1: EWocWMgzsYL9corQigOy - Louis Vuitton - T-shirt
+  Doc2: xHIwS7IUT26OxT3Eq8KX - Scotch & Soda - Scotch & Soda Shirt
+
+Pair 24 (Similarity: 1.000):
+  Doc1: H31u5PR2lVDLS3W8n7qq - Casablanca - LA Nights T-shirt
+  Doc2: WbAERV0LNeAGmEr3HuOD - Casablanca - LA Nights T-shirt
+
+Pair 25 (Similarity: 0.984):
+  Doc1: HMQE5MTfLDGafvh5C2b0 - AMIRI - T-shirt met Garden-print
+  Doc2: x7NnJqjhHY37VEei6SJS - AMIRI - Snake T-shirt
+
+Pair 26 (Similarity: 0.969):
+  Doc1: HMRmWkTu3JICQgkmEsTA - Casablanca - Le Passage T-shirt
+  Doc2: HYCrZOJepejdspV7M1zE - Casablanca - Équipement Sportif T-shirt
+
+Pair 27 (Similarity: 1.000):
+  Doc1: HMRmWkTu3JICQgkmEsTA - Casablanca - Le Passage T-shirt
+  Doc2: ZSeLF5visjXvosYgpC9g - Casablanca - Le Passage T-shirt
+
+Pair 28 (Similarity: 0.969):
+  Doc1: HMRmWkTu3JICQgkmEsTA - Casablanca - Le Passage T-shirt
+  Doc2: hO6Jn5g3JiyeU7CvA3Jc - Casablanca - Équipement Sportif T-shirt
+
+Pair 29 (Similarity: 0.969):
+  Doc1: HYCrZOJepejdspV7M1zE - Casablanca - Équipement Sportif T-shirt
+  Doc2: ZSeLF5visjXvosYgpC9g - Casablanca - Le Passage T-shirt
+
+Pair 30 (Similarity: 1.000):
+  Doc1: HYCrZOJepejdspV7M1zE - Casablanca - Équipement Sportif T-shirt
+  Doc2: hO6Jn5g3JiyeU7CvA3Jc - Casablanca - Équipement Sportif T-shirt
+
+Pair 31 (Similarity: 0.969):
+  Doc1: KcEbYDDNxto0DjTHdY9J - Nike - Nike Air Max Plus OG
+  Doc2: vkrZdFzzALhyioiuEtvA - Nike - Nike NOCTA Air Force 1 Pink Foam
+
+Pair 32 (Similarity: 0.969):
+  Doc1: Nsoab9HcBd8mN37NUCpj - Burberry - EKD cotton T-shirt
+  Doc2: ZAFpdo8cpCvyLCN3S2Mh - Burberry - Equestrian Knight-print cotton T-shirt
+
+Pair 33 (Similarity: 0.969):
+  Doc1: RO6x6Qep3rhFX18DWOvL - Burberry - cotton T-shirt
+  Doc2: tiFdx3FZ6DtxvDQXcvKs - Burberry - Bee-print T-shirt
+
+Pair 34 (Similarity: 0.953):
+  Doc1: T6MzZFnCaHONwWFcnsix - North 84 - Pants
+  Doc2: XkPnLn8no1Xr4efIZybu - Jacquemus - Loose fit cargopants
+
+Pair 35 (Similarity: 0.984):
+  Doc1: UpapUMh5UCejTe9EZ0ly - Polo Ralph Lauren - Gorham puffer jack met donsvulling en capuchon
+  Doc2: Zxe3FSNDkEGL20J2LzQq - The North Face - Mountain Q windjacket with capuchon and DryVent
+
+Pair 36 (Similarity: 0.953):
+  Doc1: UpapUMh5UCejTe9EZ0ly - Polo Ralph Lauren - Gorham puffer jack met donsvulling en capuchon
+  Doc2: t02FPlJYgIV8CHWdlYG1 - Polo Ralph Lauren - Jack met klepzakken en logoborduring
+
+Pair 37 (Similarity: 0.969):
+  Doc1: ZSeLF5visjXvosYgpC9g - Casablanca - Le Passage T-shirt
+  Doc2: hO6Jn5g3JiyeU7CvA3Jc - Casablanca - Équipement Sportif T-shirt
+
+Pair 38 (Similarity: 0.969):
+  Doc1: Zxe3FSNDkEGL20J2LzQq - The North Face - Mountain Q windjacket with capuchon and DryVent
+  Doc2: t02FPlJYgIV8CHWdlYG1 - Polo Ralph Lauren - Jack met klepzakken en logoborduring
+
+Pair 39 (Similarity: 1.000):
+  Doc1: jiKSQZsMc1nmHR0ix9SJ - Casablanca - logo-embroidered t-shirt
+  Doc2: mSJm7K1GoSe7bZzkRRRB - Casablanca - T-shirt met geborduurd logo en ronde hals
+
+Pair 40 (Similarity: 0.953):
+  Doc1: kdcdmU9x65C8HlCunXcF - Nike - Air Force 1 '07 LV8 EMB
+  Doc2: lNGUMLNDQuP6ruYDVwXN - Nike - Jordan Tatum 3
+
+Pair 41 (Similarity: 1.000):
+  Doc1: kxPrPEZwGSIHsbQXWE5M - Casablanca - logo-print T-shirt
+  Doc2: mo1UEQtJ64gK62jgFQWk - Casablanca - T-shirt met logoprint

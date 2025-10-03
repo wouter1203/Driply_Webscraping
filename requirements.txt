@@ -8,3 +8,5 @@ google-cloud-firestore
 pyjwt
 rembg
 loguru
+Pillow
+numpy

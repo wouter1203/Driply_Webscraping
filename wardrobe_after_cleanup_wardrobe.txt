@@ -1,0 +1,9 @@
+============================================================
+DUPLICATE DETECTION REPORT
+============================================================
+Collection: wardrobe
+Similarity Threshold: 0.95
+
+EXACT DUPLICATES:
+------------------------------
+No exact duplicates found.
